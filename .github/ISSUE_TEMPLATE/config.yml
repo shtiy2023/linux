@@ -1,10 +1,9 @@
-blank_issues_enabled: true
-
+blank_issues_enabled: false
 contact_links:
-  - name: Questions, help, feedback, etc.
-    url: https://rust-for-linux.com/contact#zulip-chat
-    about: Please use the Zulip chat.
+  - name: "⛔ Question"
+    url: https://www.raspberrypi.org/forums
+    about: "Please do not use GitHub for asking questions. If you simply have a question, then the Raspberry Pi forums are the best place to ask it. Thanks in advance for helping us keep the issue tracker clean!"
+  - name: "⛔ Problems with the Raspbian distribution packages"
+    url: https://github.com/RPi-Distro/repo
+    about: "If you have problems with the Raspbian distribution packages, please report them in the github.com/RPi-Distro/repo."
 
-  - name: Report a security bug
-    url: https://docs.kernel.org/admin-guide/security-bugs.html
-    about: Please read the "Security bugs" page in the kernel documentation.
