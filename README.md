@@ -21,10 +21,6 @@ Build status for rpi-5.15.y:
 [![Pi kernel build tests](https://github.com/raspberrypi/linux/actions/workflows/kernel-build.yml/badge.svg?branch=rpi-5.15.y)](https://github.com/raspberrypi/linux/actions/workflows/kernel-build.yml)
 [![dtoverlaycheck](https://github.com/raspberrypi/linux/actions/workflows/dtoverlaycheck.yml/badge.svg?branch=rpi-5.15.y)](https://github.com/raspberrypi/linux/actions/workflows/dtoverlaycheck.yml)
 
-Build status for rpi-6.0.y:
-[![Pi kernel build tests](https://github.com/raspberrypi/linux/actions/workflows/kernel-build.yml/badge.svg?branch=rpi-6.0.y)](https://github.com/raspberrypi/linux/actions/workflows/kernel-build.yml)
-[![dtoverlaycheck](https://github.com/raspberrypi/linux/actions/workflows/dtoverlaycheck.yml/badge.svg?branch=rpi-6.0.y)](https://github.com/raspberrypi/linux/actions/workflows/dtoverlaycheck.yml)
-
 Build status for rpi-6.1.y:
 [![Pi kernel build tests](https://github.com/raspberrypi/linux/actions/workflows/kernel-build.yml/badge.svg?branch=rpi-6.1.y)](https://github.com/raspberrypi/linux/actions/workflows/kernel-build.yml)
 [![dtoverlaycheck](https://github.com/raspberrypi/linux/actions/workflows/dtoverlaycheck.yml/badge.svg?branch=rpi-6.1.y)](https://github.com/raspberrypi/linux/actions/workflows/dtoverlaycheck.yml)
@@ -33,3 +29,7 @@ Build status for rpi-6.1.y:
 Rust for Linux is the project adding support for the Rust language to the Linux kernel.
 
 Please read https://rust-for-linux.com for information about the project and feel free to [contact us](https://rust-for-linux.com/contact) and/or to [contribute](https://rust-for-linux.com/contributing)!
+
+Build status for rpi-6.2.y:
+[![Pi kernel build tests](https://github.com/raspberrypi/linux/actions/workflows/kernel-build.yml/badge.svg?branch=rpi-6.2.y)](https://github.com/raspberrypi/linux/actions/workflows/kernel-build.yml)
+[![dtoverlaycheck](https://github.com/raspberrypi/linux/actions/workflows/dtoverlaycheck.yml/badge.svg?branch=rpi-6.2.y)](https://github.com/raspberrypi/linux/actions/workflows/dtoverlaycheck.yml)
