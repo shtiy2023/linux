@@ -1225,24 +1225,29 @@ static int bcm2835_pinctrl_probe(struct platform_device *pdev)
 	if (!pc)
 		return -ENOMEM;
 
+	//把 bcm2835_pinctrl pc 结构体放到 pdev->dev->driver_data下
 	platform_set_drvdata(pdev, pc);
 	pc->dev = dev;
 
+	//将device tree下的address转换为struct resource
 	err = of_address_to_resource(np, 0, &iomem);
 	if (err) {
 		dev_err(dev, "could not get IO memory\n");
 		return err;
 	}
 
+	//将io地址空间重映射到虚拟地址上，并return pointer to the remapped memory
 	pc->base = devm_ioremap_resource(dev, &iomem);
 	if (IS_ERR(pc->base))
 		return PTR_ERR(pc->base);
 
+	// 查找pdev->dev.of_node和bcm2835_pinctrl_match中最匹配的元素，并返回最匹配的结果
 	match = of_match_node(bcm2835_pinctrl_match, pdev->dev.of_node);
 	if (!match)
 		return -EINVAL;
-
-	pdata = match->data;
+		
+	//匹配of节点的bcm_plat_data
+	pdata = match->data;   
 	is_7211 = of_device_is_compatible(np, "brcm,bcm7211-gpio");
 
 	pc->gpio_chip = *pdata->gpio_chip;
@@ -1252,6 +1257,7 @@ static int bcm2835_pinctrl_probe(struct platform_device *pdev)
 		unsigned long events;
 		unsigned offset;
 
+		// clear 相关寄存器
 		/* clear event detection flags */
 		bcm2835_gpio_wr(pc, GPREN0 + i * 4, 0);
 		bcm2835_gpio_wr(pc, GPFEN0 + i * 4, 0);
@@ -1265,22 +1271,28 @@ static int bcm2835_pinctrl_probe(struct platform_device *pdev)
 		for_each_set_bit(offset, &events, 32)
 			bcm2835_gpio_wr(pc, GPEDS0 + i * 4, BIT(offset));
 
+		//初始化 spin_lock
 		raw_spin_lock_init(&pc->irq_lock[i]);
 	}
 
 	pc->pctl_desc = *pdata->pctl_desc;
+	//devm_pinctrl_register: register a pin controller device
+	//向pinctrl子系统，注册 pin controller
 	pc->pctl_dev = devm_pinctrl_register(dev, &pc->pctl_desc, pc);
 	if (IS_ERR(pc->pctl_dev)) {
 		gpiochip_remove(&pc->gpio_chip);
 		return PTR_ERR(pc->pctl_dev);
 	}
 
+	// 在pc->gpio_range中添加信息
 	pc->gpio_range = *pdata->gpio_range;
 	pc->gpio_range.base = pc->gpio_chip.base;
 	pc->gpio_range.gc = &pc->gpio_chip;
+	// add gpio_range to pinctrl_dev
 	pinctrl_add_gpio_range(pc->pctl_dev, &pc->gpio_range);
 
 	girq = &pc->gpio_chip.irq;
+	// 将bcm2835_gpio_irq_chip中断芯片注册到 pc-> gpio_chip.irq
 	gpio_irq_chip_set_chip(girq, &bcm2835_gpio_irq_chip);
 	girq->parent_handler = bcm2835_gpio_irq_handler;
 	girq->num_parents = BCM2835_NUM_IRQS;
@@ -1313,8 +1325,10 @@ static int bcm2835_pinctrl_probe(struct platform_device *pdev)
 		int len;
 		char *name;
 
+		//将当前np下的中断视为gpio_irq的parent_irqs
 		girq->parents[i] = irq_of_parse_and_map(np, i);
 		if (!is_7211) {
+			//如果不是bcm7211,则判断是否有parent_irq,如果有则continue,没有就记录parent_irq数量并退出for循环
 			if (!girq->parents[i]) {
 				girq->num_parents = i;
 				break;
@@ -1322,6 +1336,7 @@ static int bcm2835_pinctrl_probe(struct platform_device *pdev)
 			continue;
 		}
 		/* Skip over the all banks interrupts */
+		//如果是bcm7211，则生成唤醒中断，并向内核请求注册wake_isr
 		pc->wake_irq[i] = irq_of_parse_and_map(np, i +
 						       BCM2835_NUM_IRQS + 1);
 
@@ -1335,6 +1350,7 @@ static int bcm2835_pinctrl_probe(struct platform_device *pdev)
 		snprintf(name, len, "%s:bank%d", dev_name(pc->dev), i);
 
 		/* These are optional interrupts */
+		// 注册wake_irq 
 		err = devm_request_irq(dev, pc->wake_irq[i],
 				       bcm2835_gpio_wake_irq_handler,
 				       IRQF_SHARED, name, pc);
@@ -1344,8 +1360,10 @@ static int bcm2835_pinctrl_probe(struct platform_device *pdev)
 	}
 
 	girq->default_type = IRQ_TYPE_NONE;
+	//girq中断处理函数为 Level type irq handler
 	girq->handler = handle_level_irq;
 
+	//注册gpio_chip
 	err = gpiochip_add_data(&pc->gpio_chip, pc);
 	if (err) {
 		dev_err(dev, "could not add GPIO chip\n");
