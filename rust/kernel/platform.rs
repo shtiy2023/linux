@@ -6,11 +6,14 @@
 //!
 //! C header: [`include/linux/platform_device.h`](../../../../include/linux/platform_device.h)
 
+// use bindings::slab;
+
 use crate::{
     bindings,
     device::{self, RawDevice},
     driver,
     error::{from_kernel_result, Result},
+    io_mem::Resource,
     of,
     str::CStr,
     to_result,
@@ -182,6 +185,15 @@ impl Device {
     pub fn id(&self) -> i32 {
         // SAFETY: By the type invariants, we know that `self.ptr` is non-null and valid.
         unsafe { (*self.ptr).id }
+    }
+
+    /// Returns the Resource of the platform device
+    pub fn res(&self) -> Option<Resource> {
+        //SAFETY: By the type invariants, we know that 'self.ptr' is non-null and valid
+        let pdev = unsafe { &*self.ptr };
+        //SAFETY: we know that 'platform_device.resource[0]' is non-null
+        let res = unsafe { *pdev.resource };
+        Resource::new(res.start, res.end)
     }
 }
 

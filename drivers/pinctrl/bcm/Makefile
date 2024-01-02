@@ -3,6 +3,7 @@
 
 obj-$(CONFIG_PINCTRL_BCM281XX)		+= pinctrl-bcm281xx.o
 obj-$(CONFIG_PINCTRL_BCM2835)		+= pinctrl-bcm2835.o
+obj-$(CONFIG_PINCTRL_BCM2835_RUST)  += pinctrl_bcm2835_rust.o
 obj-$(CONFIG_PINCTRL_BCM4908)		+= pinctrl-bcm4908.o
 obj-$(CONFIG_PINCTRL_BCM63XX)		+= pinctrl-bcm63xx.o
 obj-$(CONFIG_PINCTRL_BCM6318)		+= pinctrl-bcm6318.o
@@ -17,3 +18,5 @@ obj-$(CONFIG_PINCTRL_NS)		+= pinctrl-ns.o
 obj-$(CONFIG_PINCTRL_NSP_GPIO)		+= pinctrl-nsp-gpio.o
 obj-$(CONFIG_PINCTRL_NS2_MUX)		+= pinctrl-ns2-mux.o
 obj-$(CONFIG_PINCTRL_NSP_MUX)		+= pinctrl-nsp-mux.o
+
+
