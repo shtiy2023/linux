@@ -6,6 +6,8 @@
 //!
 //! C header: [`include/linux/platform_device.h`](../../../../include/linux/platform_device.h)
 
+use bindings::slab;
+
 use crate::{
     bindings,
     device::{self, RawDevice},
@@ -15,7 +17,7 @@ use crate::{
     str::CStr,
     to_result,
     types::ForeignOwnable,
-    ThisModule,
+    ThisModule, io_mem::Resource,
 };
 
 /// A registration of a platform driver.
@@ -183,6 +185,16 @@ impl Device {
         // SAFETY: By the type invariants, we know that `self.ptr` is non-null and valid.
         unsafe { (*self.ptr).id }
     }
+
+    /// Returns the Resource of the platform device
+    pub fn res(&self) -> Option<Resource> {
+        //SAFETY: By the type invariants, we know that 'self.ptr' is non-null and valid
+        let pdev= unsafe {&*self.ptr};
+        //SAFETY: we know that 'platform_device.resource[0]' is non-null
+        let res= unsafe{*pdev.resource};
+        Resource::new(res.start,res.end)
+    }
+
 }
 
 // SAFETY: The device returned by `raw_device` is the raw platform device.
