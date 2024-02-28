@@ -299,7 +299,7 @@ impl amba::Driver for PL061Device {
             irq
         )?;
 
-        dev_info!(data.dev, "PL061 GPIO chip registered\n");
+        dev_info!(data.dev, "RUST PL061 GPIO chip registered\n");
 
         Ok(data)
     }

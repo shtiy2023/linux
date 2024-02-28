@@ -14,6 +14,7 @@ use kernel::{
     io_mem::IoMem, 
     sync::{ArcBorrow,Arc},
     platform, define_of_id_table,
+    module_platform_driver,
     of,
 };
 
@@ -258,5 +259,14 @@ impl platform::Driver for BCM2835Device{
         Ok(data)
     }
 
+}
+
+
+module_platform_driver! {
+    type: BCM2835Device,
+    name: "pinctrl_bcm2835_rust",
+    author: "Tianyu She",
+    description: "BCM2835 GPIO Part",
+    license: "GPL",
 }
 

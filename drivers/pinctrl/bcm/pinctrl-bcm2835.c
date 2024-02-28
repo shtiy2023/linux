@@ -1230,6 +1230,8 @@ static int bcm2835_pinctrl_probe(struct platform_device *pdev)
 	pc->dev = dev;
 
 	//将device tree下的address转换为struct resource
+	//只映射了resource数组中的第0个
+	//并对相应的platform_device增加了一次引用计数（？
 	err = of_address_to_resource(np, 0, &iomem);
 	if (err) {
 		dev_err(dev, "could not get IO memory\n");
