@@ -49,49 +49,50 @@ const GPFSEL0:usize = 0x0; //function select
 const GPSET0:usize = 0x1c; //pin output set
 const GPCLR0:usize = 0x28; //pin output clear
 const GPLEV0:usize = 0x34; //pin level
-const GPEDS0:usize = 0x40; //pin event detect Status
-const GPREN0:usize = 0x4c; //pin rising edge detect enable
-const GPFEN0:usize = 0x58; //pin falling edge detect enable
-const GPHEN0:usize = 0x64; //pin high detect enable
-const GPLEN0:usize = 0x70; //pin low detect enable
-const GPAREN0:usize= 0x7c; //pin async rising edge detect
-const GPAFEN0:usize= 0x88; // pin async falling edge detect
-const GPPUD:usize = 0x94;  //pin pull-up/down enable
-const GPPUDCLK0:usize = 0x98; // pin pull-up/down enable clock
+// const GPEDS0:usize = 0x40; //pin event detect Status
+// const GPREN0:usize = 0x4c; //pin rising edge detect enable
+// const GPFEN0:usize = 0x58; //pin falling edge detect enable
+// const GPHEN0:usize = 0x64; //pin high detect enable
+// const GPLEN0:usize = 0x70; //pin low detect enable
+// const GPAREN0:usize= 0x7c; //pin async rising edge detect
+// const GPAFEN0:usize= 0x88; // pin async falling edge detect
+// const GPPUD:usize = 0x94;  //pin pull-up/down enable
+// const GPPUDCLK0:usize = 0x98; // pin pull-up/down enable clock
 //TODO: no sure the precise offset size of BCM2835
 const GPIO_SIZE:usize= 0x1000;   
 
 const BCM2835_NUM_GPIOS:u16 = 54;
-const BCM2835_NUM_BANKS:usize  = 2;
-const BCM2835_NUM_IRQS:usize = 3;
+// const BCM2835_NUM_BANKS:usize  = 2;
+// const BCM2835_NUM_IRQS:usize = 3;
 
 // bcm2835_fsel
-const BCM2835_FSEL_COUNT:usize = 8;
+// const BCM2835_FSEL_COUNT:usize = 8;
 const BCM2835_FSEL_MASK:u32 = 0x7;
 // brcm, function property
 const BCM2835_FSEL_GPIO_IN:u32  = 0;
 const BCM2835_FSEL_GPIO_OUT:u32 = 1;
-const BCM2835_FSEL_ALT5:u32     = 2;
-const BCM2835_FSEL_ALT4:u32     = 3;
-const BCM2835_FSEL_ALT0:u32     = 4;
-const BCM2835_FSEL_ALT1:u32     = 5;
-const BCM2835_FSEL_ALT2:u32     = 6;
-const BCM2835_FSEL_ALT3:u32     = 7;
+// const BCM2835_FSEL_ALT5:u32     = 2;
+// const BCM2835_FSEL_ALT4:u32     = 3;
+// const BCM2835_FSEL_ALT0:u32     = 4;
+// const BCM2835_FSEL_ALT1:u32     = 5;
+// const BCM2835_FSEL_ALT2:u32     = 6;
+// const BCM2835_FSEL_ALT3:u32     = 7;
 
-const BCM2835_FUNCTIONS:[&str;BCM2835_FSEL_COUNT]= [
-    "gpio_in",
-    "gpio_out",
-    "alt0",
-    "alt1",
-    "alt2",
-    "alt3",
-    "alt4",
-    "alt5",
-];
+// const BCM2835_FUNCTIONS:[&str;BCM2835_FSEL_COUNT]= [
+//     "gpio_in",
+//     "gpio_out",
+//     "alt0",
+//     "alt1",
+//     "alt2",
+//     "alt3",
+//     "alt4",
+//     "alt5",
+// ];
 
-struct BCM2835DataInner{
-    //TODO: data in bcm2835
-}
+
+// struct BCM2835DataInner{
+//     //TODO: data in bcm2835
+// }
 
 struct BCM2835Resources{
     base: IoMem<GPIO_SIZE>,
@@ -129,15 +130,15 @@ impl BCM2835Device {
 
     #[inline]
     fn bcm2835_gpio_get_bit(data:ArcBorrow<'_, DeviceData>,reg:usize,offset:u32)->Result<bool>{
-        let reg = GPIO_REG_OFFSET!(offset as usize)*4;
+        let reg = reg + GPIO_REG_OFFSET!(offset as usize)*4;
         Ok((Self::bcm2835_gpio_rd(data,reg)?>> GPIO_REG_SHIFT!(offset) & 1) !=0 )
     }   
 
     #[inline]
     fn bcm2835_gpio_set_bit(data:ArcBorrow<'_, DeviceData>,reg:usize,offset:u32)->Result{
-        let reg_off= GPIO_REG_OFFSET!(offset as usize)*4;
+        let reg= reg + GPIO_REG_OFFSET!(offset as usize)*4;
         let val = bit(GPIO_REG_SHIFT!(offset)).into();
-        Self::bcm2835_gpio_wr(data,reg_off,val);
+        Self::bcm2835_gpio_wr(data,reg,val)?;
         Ok(())
     }
 
@@ -164,14 +165,14 @@ impl BCM2835Device {
             val |= fsel << FSEL_SHIFT!(pin as u32);
 
             // dev_dbg!(data.dev,"trans {} ({} <= {})\n",val,pin,BCM2835_FUNCTIONS[BCM2835_FSEL_GPIO_IN as usize]);
-            Self::bcm2835_gpio_wr(data,FSEL_REG!(pin),val);
+            Self::bcm2835_gpio_wr(data,FSEL_REG!(pin),val)?;
         }   
         
         val &= !(BCM2835_FSEL_MASK << FSEL_SHIFT!(pin as u32));
         val |= fsel << FSEL_SHIFT!(pin as u32);
 
         // dev_dbg!(data,"write {} ({}<={})\n",val,pin,BCM2835_FUNCTIONS[fsel]);
-        Self::bcm2835_gpio_wr(data,FSEL_REG!(pin),val);
+        Self::bcm2835_gpio_wr(data,FSEL_REG!(pin),val)?;
         Ok(())
     }
 }
@@ -206,14 +207,14 @@ impl gpio::Chip for BCM2835Device {
 
     fn direction_output(data:ArcBorrow<'_,DeviceData>,offset:u32,value:bool)->Result{
         let reg = if value {GPSET0} else {GPCLR0};
-        Self::bcm2835_gpio_set_bit(data,reg, offset);
-        Self::bcm2835_pinctrl_fsel_set(data,offset as usize, BCM2835_FSEL_GPIO_OUT);
+        Self::bcm2835_gpio_set_bit(data,reg, offset)?;
+        Self::bcm2835_pinctrl_fsel_set(data,offset as usize, BCM2835_FSEL_GPIO_OUT)?;
         Ok(())
     }
 
     fn set(data:ArcBorrow<'_,DeviceData>,offset:u32,value:bool){
         let reg = if value {GPSET0} else {GPCLR0};
-        Self::bcm2835_pinctrl_fsel_set(data, reg, offset);
+        let _ = Self::bcm2835_pinctrl_fsel_set(data, reg, offset);
     }
 
     fn get(data:ArcBorrow<'_, DeviceData>,offset:u32)->Result<bool>{
@@ -232,7 +233,7 @@ impl platform::Driver for BCM2835Device{
     fn probe(dev:&mut platform::Device,_data:Option<&Self::IdInfo>)-> Result<Arc<DeviceData>>{
         let res = dev.res().ok_or(ENXIO)?;
 
-        let mut data = kernel::new_device_data!(
+        let data = kernel::new_device_data!(
             gpio::Registration::new(),
             BCM2835Resources{
                 //SAFETY: 
