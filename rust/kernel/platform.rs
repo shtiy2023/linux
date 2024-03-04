@@ -6,7 +6,7 @@
 //!
 //! C header: [`include/linux/platform_device.h`](../../../../include/linux/platform_device.h)
 
-use bindings::slab;
+// use bindings::slab;
 
 use crate::{
     bindings,
