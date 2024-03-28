@@ -62,6 +62,7 @@ const GPLEV0:usize = 0x34; //pin level
 const GPIO_SIZE:usize= 0x1000;   
 
 const BCM2835_NUM_GPIOS:u16 = 54;
+const BCM2711_NUM_GPIOS:u16 = 58;
 // const BCM2835_NUM_BANKS:usize  = 2;
 // const BCM2835_NUM_IRQS:usize = 3;
 
@@ -227,7 +228,8 @@ impl platform::Driver for BCM2835Device{
 
     define_of_id_table! {(),[
         //FIXME: None is likely not correct, should fix it maybe
-        (of::DeviceId::Compatible(b"brcm,bcm2835-gpio"),None),
+        (of::DeviceId::Compatible(b"brcm,bcm2711-gpio"),None),
+        // (of::DeviceId::Compatible(b"brcm,bcm2835-gpio"),None),
     ]}
 
     fn probe(dev:&mut platform::Device,_data:Option<&Self::IdInfo>)-> Result<Arc<DeviceData>>{
@@ -249,7 +251,8 @@ impl platform::Driver for BCM2835Device{
 
         kernel::gpio_chip_register!(
             data.registrations().ok_or(ENXIO)?.as_pinned_mut(),
-            BCM2835_NUM_GPIOS,
+            //BCM2835_NUM_GPIOS,
+            BCM2711_NUM_GPIOS,
             None,
             dev,
             data.clone()

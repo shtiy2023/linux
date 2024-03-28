@@ -1388,7 +1388,7 @@ static int bcm2835_pinctrl_probe(struct platform_device *pdev)
 	girq->handler = handle_level_irq;
 
 	//注册gpio_chip
-	err = devm_gpiochip_add_data(&pc->gpio_chip, pc);
+	err = gpiochip_add_data(&pc->gpio_chip, pc);
 	if (err) {
 		dev_err(dev, "could not add GPIO chip\n");
 		goto out_remove;
@@ -1406,7 +1406,7 @@ static struct platform_driver bcm2835_pinctrl_driver = {
 	.driver = {
 		.name = MODULE_NAME,
 		.of_match_table = bcm2835_pinctrl_match,
-		.suppress_bind_attrs = true,
+		// .suppress_bind_attrs = true,
 	},
 };
 module_platform_driver(bcm2835_pinctrl_driver);

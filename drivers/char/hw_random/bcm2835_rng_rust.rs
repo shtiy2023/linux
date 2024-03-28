@@ -42,6 +42,8 @@ impl platform::Driver for RngDriver {
 
     kernel::define_of_id_table! {(), [
         (of::DeviceId::Compatible(b"brcm,bcm2835-rng"), None),
+        // (of::DeviceId::Compatible(b"brcm,bcm2711-rng200"), None),
+        
     ]}
 
     fn probe(dev: &mut platform::Device, _id_info: Option<&Self::IdInfo>) -> Result<Self::Data> {
